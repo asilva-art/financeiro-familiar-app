@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Financeiro Familiar App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <p class="kicker">Financeiro Familiar</p>
+    <h1>App de Monitoramento</h1>
+    <p class="subtitle">MVP v1 com importação contínua, deduplicação e conciliação.</p>
+
+    <section class="card upload">
+      <div>
+        <label>Importar base consolidada (CSV)</label>
+        <input id="csv-file" type="file" accept=".csv" />
+      </div>
+      <button id="upload-btn">Importar</button>
+      <button id="reload-btn" class="ghost">Atualizar Dados</button>
+      <span id="upload-status" class="status"></span>
+    </section>
+
+    <section class="kpis" id="kpis"></section>
+
+    <section class="card filters">
+      <div class="grid-6">
+        <div><label>Busca</label><input id="q" placeholder="descricao/categoria" /></div>
+        <div><label>Banco</label><select id="banco"></select></div>
+        <div><label>Produto</label><select id="produto"></select></div>
+        <div><label>Titular</label><select id="titular"></select></div>
+        <div><label>Fatura Ref.</label><select id="fatura_ref"></select></div>
+        <div><label>Cartão Final</label><select id="cartao_final"></select></div>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <h3>Conciliação Cartão x Conta</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Banco</th><th>Ref.</th><th>Cartão</th><th>Conta</th><th>Diferença</th><th>Status</th><th>Vínculo</th>
+            </tr>
+          </thead>
+          <tbody id="reco-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <div class="table-head"><span id="count">0 registros</span></div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th><th>Ref</th><th>Banco</th><th>Produto</th><th>Titular</th><th>Categoria</th><th>Descrição</th><th>Parcela</th><th>Sinal</th><th>Valor</th><th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="tx-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
