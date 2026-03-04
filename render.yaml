@@ -2,9 +2,8 @@ services:
   - type: web
     name: financeiro-familiar-app
     runtime: python
-    rootDir: finance_app
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: cd finance_app && pip install -r requirements.txt
+    startCommand: cd finance_app && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_DB_PATH
         value: /var/data/finance.db
