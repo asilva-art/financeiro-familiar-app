@@ -62,8 +62,9 @@ table{width:100%;min-width:1200px;border-collapse:collapse}th,td{padding:8px 9px
       <div id="card-options" class="card-options"></div>
     </div>
 
-    <div class="row" style="grid-template-columns:1fr 1fr;">
+    <div class="row" style="grid-template-columns:1fr 1fr 1fr;">
       <div><label>Parcelado</label><select id="parcelado"><option value="">Todos</option><option value="true">Sim</option><option value="false">Nao</option></select></div>
+      <div><label>Fase da parcela</label><select id="status_parcela"><option value="">Todas</option><option value="EM_ANDAMENTO">Em andamento</option><option value="ULTIMA">Última parcela</option><option value="INICIO">Início do parcelamento</option></select></div>
       <div><label>&nbsp;</label><button id="reset">Limpar filtros</button></div>
     </div>
   </section>
@@ -88,7 +89,7 @@ const COLUMNS = ['data_compra_iso','fatura_referencia_vencimento','banco','produ
 
 const money = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
 const byId = id => document.getElementById(id);
-const el = {q:byId('q'),banco:byId('banco'),produto:byId('produto'),titular:byId('titular'),cc:byId('cc'),macro:byId('macro'),parcelado:byId('parcelado'),chips:byId('fatref-chips'),cardOptions:byId('card-options'),cardsAll:byId('cards-all'),cardsNone:byId('cards-none'),reset:byId('reset'),kpis:byId('kpis'),barsMacro:byId('bars-macro'),recoList:byId('reco-list'),count:byId('count'),head:byId('head'),body:byId('body')};
+const el = {q:byId('q'),banco:byId('banco'),produto:byId('produto'),titular:byId('titular'),cc:byId('cc'),macro:byId('macro'),parcelado:byId('parcelado'),statusParcela:byId('status_parcela'),chips:byId('fatref-chips'),cardOptions:byId('card-options'),cardsAll:byId('cards-all'),cardsNone:byId('cards-none'),reset:byId('reset'),kpis:byId('kpis'),barsMacro:byId('bars-macro'),recoList:byId('reco-list'),count:byId('count'),head:byId('head'),body:byId('body')};
 
 let sortKey='data_compra_iso', sortDir='asc', selectedFatRef='';
 const selectedCards = new Set();
@@ -129,6 +130,11 @@ function pass(r){
   if(el.macro.value && r.categoria_macro!==el.macro.value) return false;
   if(el.parcelado.value==='true' && String(r.eh_parcelado).toLowerCase()!=='true') return false;
   if(el.parcelado.value==='false' && String(r.eh_parcelado).toLowerCase()!=='false') return false;
+  const sp = String(r.status_parcela||'').toUpperCase();
+  const isParcelado = String(r.eh_parcelado).toLowerCase()==='true';
+  if(el.statusParcela.value==='EM_ANDAMENTO' && !(isParcelado && sp==='INTERMEDIARIA')) return false;
+  if(el.statusParcela.value==='ULTIMA' && !(isParcelado && (sp==='ULTIMA' || isLastInstallment(r.parcela_texto)))) return false;
+  if(el.statusParcela.value==='INICIO' && !(isParcelado && (sp==='INICIO' || /^0?1\/\d{2}$/.test(String(r.parcela_texto||''))))) return false;
   return true;
 }
 
@@ -237,7 +243,7 @@ function render(){
   renderTable(rows);
 }
 
-function wire(){[el.q,el.banco,el.produto,el.titular,el.cc,el.macro,el.parcelado].forEach(x=>x.addEventListener('input',render));el.reset.onclick=()=>{el.q.value='';el.banco.value='';el.produto.value='';el.titular.value='';el.cc.value='';el.macro.value='';el.parcelado.value='';selectedFatRef='';buildFaturaChips();selectedCards.clear();buildCardOptions();sortKey='data_compra_iso';sortDir='asc';render();};}
+function wire(){[el.q,el.banco,el.produto,el.titular,el.cc,el.macro,el.parcelado,el.statusParcela].forEach(x=>x.addEventListener('input',render));el.reset.onclick=()=>{el.q.value='';el.banco.value='';el.produto.value='';el.titular.value='';el.cc.value='';el.macro.value='';el.parcelado.value='';el.statusParcela.value='';selectedFatRef='';buildFaturaChips();selectedCards.clear();buildCardOptions();sortKey='data_compra_iso';sortDir='asc';render();};}
 
 function init(){fill(el.banco,'banco');fill(el.produto,'produto');fill(el.titular,'eixo_titular');fill(el.cc,'eixo_centro_custo');fill(el.macro,'categoria_macro');buildFaturaChips();buildCardOptions();buildHead();wire();render();}
 init();
